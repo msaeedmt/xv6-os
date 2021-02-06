@@ -104,3 +104,13 @@ sys_getSyscallCounter(void)
     return -1;
   return getSyscallCounter(pid);
 }
+
+int*
+sys_getChildren(void)
+{
+  int* childes;
+  if(argptr(0, (void *)&childes,60) < 0)
+    return childes;
+
+  return getChildren(childes);
+}

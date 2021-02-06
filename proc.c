@@ -541,9 +541,34 @@ getParentID(void){
   return myproc()->parent->pid;
 }
 
-int getSyscallCounter(int pid)
+int 
+getSyscallCounter(int pid)
 {
   struct proc *currentProc = myproc();
   // cprintf("count <--> %d", currentProc->sysCallsCount[pid - 1]);
   return currentProc->sysCallsCount[pid - 1];
+}
+
+int 
+*getChildren(int *childes)
+{
+
+  // soale2
+  memset(childes, 0, 63);
+  struct proc *currentProc = myproc();
+  int pidCurrentProc = currentProc->pid;
+  struct proc *p;
+  int position = 0;
+
+  acquire(&ptable.lock);
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->parent->pid == pidCurrentProc)
+    {
+      childes[position] = p->pid;
+      position++;
+    }
+
+  release(&ptable.lock);
+  return childes;
 }
