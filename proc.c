@@ -112,6 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+memset(p->sysCallsCount, 0, sizeof(p->sysCallsCount));
+
   return p;
 }
 
@@ -295,6 +297,7 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        memset(p->sysCallsCount, 0, sizeof(p->sysCallsCount));
         release(&ptable.lock);
         return pid;
       }
@@ -536,4 +539,11 @@ procdump(void)
 int
 getParentID(void){
   return myproc()->parent->pid;
+}
+
+int getSyscallCounter(int pid)
+{
+  struct proc *currentProc = myproc();
+  // cprintf("count <--> %d", currentProc->sysCallsCount[pid - 1]);
+  return currentProc->sysCallsCount[pid - 1];
 }
