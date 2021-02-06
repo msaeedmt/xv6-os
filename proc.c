@@ -112,7 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
-memset(p->sysCallsCount, 0, sizeof(p->sysCallsCount));
+  memset(p->sysCallsCount, 0, sizeof(p->sysCallsCount));
+  p->RR=QUANTUM;
 
   return p;
 }
