@@ -10,8 +10,11 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
 };
 
+enum cpuPolicy {DEFAULT = 0 , ROUNDROBIN = 1, PRIORITY = 2};
+
 extern struct cpu cpus[NCPU];
 extern int ncpu;
+extern enum cpuPolicy policy;
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
@@ -32,7 +35,7 @@ struct context {
   uint eip;
 };
 
-enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+enum  procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
@@ -50,8 +53,8 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   int sysCallsCount[25];
-  int RR;
   int priority;
+  int RR;
 };
 
 // Process memory is laid out contiguously, low addresses first:

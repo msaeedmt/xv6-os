@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+enum cpuPolicy policy = DEFAULT;
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -298,6 +300,7 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->RR=QUANTUM;
         p->state = UNUSED;
         memset(p->sysCallsCount, 0, sizeof(p->sysCallsCount));
         release(&ptable.lock);
@@ -324,13 +327,12 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
-scheduler(void)
+void scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+
   for (;;)
   {
     // Enable interrupts on this processor.
@@ -338,44 +340,68 @@ scheduler(void)
 
     acquire(&ptable.lock);
 
-    int maxPriority = 6;
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (policy == PRIORITY)
     {
-      if (p->state != RUNNABLE)
-        continue;
-
-      if (p->priority < maxPriority)
+      int maxPriority = 6;
+      for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
       {
-        maxPriority = p->priority;
+        if (p->state != RUNNABLE)
+          continue;
+
+        if (p->priority < maxPriority)
+        {
+          maxPriority = p->priority;
+        }
+      }
+      // Loop over process table looking for process to run.
+      for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+      {
+        if (p->state != RUNNABLE)
+          continue;
+
+        if (p->priority == maxPriority)
+        {
+          // Switch to chosen process.  It is the process's job
+          // to release ptable.lock and then reacquire it
+          // before jumping back to us.
+          c->proc = p;
+          switchuvm(p);
+          p->state = RUNNING;
+
+          swtch(&(c->scheduler), p->context);
+          switchkvm();
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
       }
     }
-    // Loop over process table looking for process to run.
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    else if (policy == DEFAULT || policy == ROUNDROBIN)
     {
-      if (p->state != RUNNABLE)
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
         continue;
 
-      if (p->priority == maxPriority)
-      {
-        // Switch to chosen process.  It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
-        c->proc = p;
-        switchuvm(p);
-        p->state = RUNNING;
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      c->proc = p;
+      switchuvm(p);
+      p->state = RUNNING;
 
-        swtch(&(c->scheduler), p->context);
-        switchkvm();
+      swtch(&(c->scheduler), p->context);
+      switchkvm();
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
       }
     }
+  
     release(&ptable.lock);
   }
 }
-
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
 // intena because intena is a property of this
@@ -619,4 +645,15 @@ setPriority(int pid, int priority)
     return p->priority;
   
   return 0;
+}
+
+int
+changePolicy(int newPolicy)
+{
+  if (newPolicy == ROUNDROBIN || newPolicy == PRIORITY)
+    policy = newPolicy;
+  else
+    policy = DEFAULT;
+  
+  return policy;
 }

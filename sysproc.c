@@ -128,3 +128,13 @@ sys_setPriority(void)
 
   return setPriority(pid,priority);
 }
+
+int
+sys_changePolicy(void)
+{
+  int policy;
+
+  if(argint(0, &policy) < 0)
+    return -1;
+  return changePolicy(policy);
+}
