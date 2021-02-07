@@ -183,6 +183,7 @@ UPROGS=\
 	_zombie\
 	_getParentIDtest\
 	_getChildrenTest\
+	_getSyscallCountTest\
 	_changepolicyTest\
 
 fs.img: mkfs README $(UPROGS)
@@ -255,6 +256,7 @@ EXTRA=\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	getParentIDtest.c\
 	getChildrenTest.c\
+	getSyscallCountTest.c\
 	changepolicyTest.c\
 	printf.c umalloc.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
