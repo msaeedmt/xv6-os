@@ -125,6 +125,8 @@ int             getSyscallCounter(int);
 int*            getChildren(int*);
 int             setPriority(int,int);
 int             changePolicy(int);
+int             waitAndSetTimes(int*, int* , int*);
+void            increamentTimes();
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -108,6 +108,7 @@ extern int sys_getSyscallCounter(void);
 extern int sys_getChildren(void);
 extern int sys_setPriority(void);
 extern int sys_changePolicy(void);
+extern int sys_waitAndSetTimes(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -136,6 +137,7 @@ static int (*syscalls[])(void) = {
 [SYS_getChildren] sys_getChildren,
 [SYS_setPriority] sys_setPriority,
 [SYS_changePolicy] sys_changePolicy,
+[SYS_waitAndSetTimes] sys_waitAndSetTimes,
 };
 
 void

@@ -53,6 +53,7 @@ void trap(struct trapframe *tf)
     {
       acquire(&tickslock);
       ticks++;
+      increamentTimes();
       wakeup(&ticks);
       release(&tickslock);
     }

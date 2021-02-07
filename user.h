@@ -28,6 +28,7 @@ int getSyscallCounter(int);
 int* getChildren(int*);
 int setPriority(int,int);
 int changePolicy(int);
+int waitAndSetTimes(int*,int*,int*);
 
 // ulib.c
 int stat(const char*, struct stat*);

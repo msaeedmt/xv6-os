@@ -55,6 +55,7 @@ struct proc {
   int sysCallsCount[25];
   int priority;
   int RR;
+  int creationTime, terminationTime ,runningTime, readyTime , sleepingTime;
 };
 
 // Process memory is laid out contiguously, low addresses first:

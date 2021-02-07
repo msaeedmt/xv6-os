@@ -138,3 +138,20 @@ sys_changePolicy(void)
     return -1;
   return changePolicy(policy);
 }
+
+int
+sys_waitAndSetTimes(void)
+{
+  int *cpuBurstTime;
+  int *turnAroundTime;
+  int *waitingTime;
+
+  if(argptr(0, (void *)&cpuBurstTime,10) < 0)
+    return -1; 
+  if(argptr(1, (void *)&turnAroundTime,20) < 0)
+    return -1;
+  if(argptr(2, (void *)&waitingTime,30) < 0)
+    return -1;
+
+  return waitAndSetTimes(cpuBurstTime,turnAroundTime,waitingTime);
+}
