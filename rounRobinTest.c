@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         totalWaiting += waitings[i];
     }
     
-    printf(1,"\n\naverages of total   %d      %d        %d", totalTurnAround / 30, totalCpuBurst / 30, totalWaiting / 30);
+    printf(1,"\n\navgTurnAroundTotal => %d\navgCpuBurstTotal => %d\navgWaitingTotal => %d\n\n", totalTurnAround / 10, totalCpuBurst / 10, totalWaiting / 10);
 
 
     exit();

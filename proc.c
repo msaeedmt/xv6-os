@@ -837,6 +837,15 @@ changePolicy(int newPolicy)
 {
   if (newPolicy == ROUNDROBIN || newPolicy == PRIORITY)
     policy = newPolicy;
+  else if (newPolicy == PRIORITYQUEQUES)
+  {
+    // noQueue.tail = 0;
+    // defaultQueue.tail = 0;
+    // priorityQueue.tail = 0;
+    // xPriorityQueue.tail = 0;
+    // roundRobinQueue.tail = 0;
+    policy = newPolicy;
+  }
   else
     policy = DEFAULT;
   

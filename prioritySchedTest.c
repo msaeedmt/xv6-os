@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[])
 {
-
     int pids[30];
     int cpuBursts[30];
     int turnArounds[30];
@@ -24,12 +23,16 @@ int main(int argc, char *argv[])
         {
             fork();
             if (getpid() != base_pid)
-                setPriority(getpid(), (i / 5) + (i % 5 != 0));
+            {
+                printf(1, "\n %d -- > %d\n", setPriority(getpid(), 7-(i / 5) + (i % 5 != 0)), getpid());
+            }
         }
 
     if (getpid() != base_pid)
+    {
         for (j = 1; j <= 250; j++)
             printf(1, "  /%d/:/%d/  ", getpid(), j);
+    }
 
     if (getpid() == base_pid)
         for (i = 0; i < 30; i++)
@@ -39,7 +42,7 @@ int main(int argc, char *argv[])
 
     printf(1, "\n\nid : TurnAround  CpuBurst  Waiting");
     for (i = 0; i < 30; i++)
-        printf(1, "\n%d  :   %d       %d       %d", pids[i], turnArounds[i], cpuBursts[i], waitings[i]);
+        printf(1, "\n%d --> %d  :   %d       %d       %d", i,pids[i], turnArounds[i], cpuBursts[i], waitings[i]);
 
     int totalTurnAround = 0;
     int totalCpuBurst = 0;
@@ -59,12 +62,12 @@ int main(int argc, char *argv[])
             totalClassesCpuBurst[i] += cpuBursts[(i * 5) + j];
             totalClassesWaiting[i] += waitings[(i * 5) + j];
         }
-        printf(1,"\naverages of class %d :   %d      %d        %d", i+1,totalClassesTurnAround[i] / 5, totalClassesCpuBurst[i] / 5, totalClassesWaiting[i] / 5);
+        printf(1, "\naverages of priority %d :   %d      %d        %d", i + 1, totalClassesTurnAround[i] / 5, totalClassesCpuBurst[i] / 5, totalClassesWaiting[i] / 5);
         totalTurnAround += totalClassesTurnAround[i];
         totalCpuBurst += totalClassesCpuBurst[i];
         totalWaiting += totalClassesWaiting[i];
     }
-    printf(1,"\n\naverages of total   %d      %d        %d", totalTurnAround / 30, totalCpuBurst / 30, totalWaiting / 30);
+    printf(1, "\n\navgTurnAroundTotal => %d\navgCpuBurstTotal => %d\navgWaitingTotal => %d\n\n", totalTurnAround / 30, totalCpuBurst / 30, totalWaiting / 30);
 
     exit();
 }
