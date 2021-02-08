@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
             fork();
             if (getpid() != base_pid)
             {
-                printf(1, "\n %d -- > %d\n", setPriority(getpid(), 7-(i / 5) + (i % 5 != 0)), getpid());
+                printf(1, "\n %d -- > %d\n", setPriority(getpid(), (i / 5) + (i % 5 != 0)), getpid());
             }
         }
 

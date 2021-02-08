@@ -415,10 +415,10 @@ void scheduler(void)
       // int i;
       int runnableStates = 1;
 
-      currentQueue = NOQUEUE;
+      currentQueue = PARENTQUEUE;
       for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
       {
-        if (p->state != RUNNABLE || p->queue!=NOQUEUE)
+        if (p->state != RUNNABLE || p->queue!=PARENTQUEUE)
           continue;
 
         // Switch to chosen process.  It is the process's job
@@ -442,10 +442,8 @@ void scheduler(void)
         runnableStates = 0;
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
         {
-          // cprintf("***********%d***********",defaultQueue.queue[i]->pid);
           if (p->state != RUNNABLE || p->queue!=DEFAULTQUEUE)
             continue;
-          // cprintf("------------------------------------------------------------------>1");
 
           runnableStates = 1;
           // Switch to chosen process.  It is the process's job
@@ -474,7 +472,6 @@ void scheduler(void)
         {
           if (p->state != RUNNABLE || p->queue!=PRIORITYQUEUE)
             continue;
-          // cprintf("------------------------------------------------------------------3");
 
           runnableStates = 1;
 
@@ -518,7 +515,6 @@ void scheduler(void)
         {
           if (p->state != RUNNABLE  || p->queue!=XPRIORITYQUEUE)
             continue;
-          // cprintf("------------------------------------------------------------------2");
 
           runnableStates = 1;
 
@@ -563,7 +559,6 @@ void scheduler(void)
           if (p->state != RUNNABLE || p->queue!=ROUNDROBINQUEUE)
             continue;
 
-          // cprintf("------------------------------------------------------------------1");
           runnableStates = 1;
           // Switch to chosen process.  It is the process's job
           // to release ptable.lock and then reacquire it

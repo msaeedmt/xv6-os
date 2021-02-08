@@ -20,11 +20,12 @@ enum cpuPolicy
 };
 enum currentQueue
 {
-  NOQUEUE = 0,
+  PARENTQUEUE = 0,
   DEFAULTQUEUE = 1,
   PRIORITYQUEUE = 2,
   XPRIORITYQUEUE = 3,
-  ROUNDROBINQUEUE = 4
+  ROUNDROBINQUEUE = 4,
+  NOQUEUE = 5,
 };
 
 extern struct cpu cpus[NCPU];

@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
             totalClassesCpuBurst[i] += cpuBursts[(i * 10) + j];
             totalClassesWaiting[i] += waitings[(i * 10) + j];
         }
-        printf(1, "\navg queque%d :   %d      %d      %d", i + 1, totalClassesTurnAround[i] / 10, totalClassesCpuBurst[i] / 10, totalClassesWaiting[i] / 10);
+        printf(1, "\navg queue %d :   %d      %d      %d", i + 1, totalClassesTurnAround[i] / 10, totalClassesCpuBurst[i] / 10, totalClassesWaiting[i] / 10);
         totalTurnAround += totalClassesTurnAround[i];
         totalCpuBurst += totalClassesCpuBurst[i];
         totalWaiting += totalClassesWaiting[i];
