@@ -155,3 +155,17 @@ sys_waitAndSetTimes(void)
 
   return waitAndSetTimes(cpuBurstTime,turnAroundTime,waitingTime);
 }
+
+int
+sys_pushToQueue(void)
+{
+  int queueNumber;
+  int pid;
+
+  if(argint(0, &queueNumber) < 0)
+    return -1;
+  if(argint(1, &pid) < 0)
+    return -1;
+
+  return pushToQueue(queueNumber,pid);
+}

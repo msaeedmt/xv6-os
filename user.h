@@ -29,6 +29,7 @@ int* getChildren(int*);
 int setPriority(int,int);
 int changePolicy(int);
 int waitAndSetTimes(int*,int*,int*);
+int pushToQueue(int, int);
 
 // ulib.c
 int stat(const char*, struct stat*);

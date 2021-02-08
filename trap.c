@@ -15,6 +15,7 @@ struct spinlock tickslock;
 uint ticks;
 
 enum cpuPolicy policy;
+enum currentQueue currentQueue;
 
 void tvinit(void)
 {
@@ -114,7 +115,7 @@ void trap(struct trapframe *tf)
     {
       yield();
     }
-    else if (policy == ROUNDROBIN)
+    else if (policy == ROUNDROBIN || currentQueue == ROUNDROBINQUEUE)
     {
       int counter = myproc()->RR;
       if (counter)

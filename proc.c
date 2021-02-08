@@ -8,6 +8,12 @@
 #include "spinlock.h"
 
 enum cpuPolicy policy = DEFAULT;
+enum currentQueue currentQueue = NOQUEUE;
+struct queue defaultQueue;
+struct queue priorityQueue;
+struct queue xPriorityQueue;
+struct queue roundRobinQueue;
+struct queue noQueue;
 
 struct {
   struct spinlock lock;
@@ -403,6 +409,180 @@ void scheduler(void)
       c->proc = 0;
       }
     }
+    else if (policy == PRIORITYQUEQUES)
+    {
+
+      // int i;
+      int runnableStates = 1;
+
+      currentQueue = NOQUEUE;
+      for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+      {
+        if (p->state != RUNNABLE || p->queue!=NOQUEUE)
+          continue;
+
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+
+      currentQueue = DEFAULTQUEUE;
+      while (runnableStates > 0)
+      {
+        runnableStates = 0;
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          // cprintf("***********%d***********",defaultQueue.queue[i]->pid);
+          if (p->state != RUNNABLE || p->queue!=DEFAULTQUEUE)
+            continue;
+          // cprintf("------------------------------------------------------------------>1");
+
+          runnableStates = 1;
+          // Switch to chosen process.  It is the process's job
+          // to release ptable.lock and then reacquire it
+          // before jumping back to us.
+          c->proc = p;
+          switchuvm(p);
+          p->state = RUNNING;
+
+          swtch(&(c->scheduler), p->context);
+          switchkvm();
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+      }
+
+      runnableStates = 1;
+      currentQueue = PRIORITYQUEUE;
+      while (runnableStates > 0)
+      {
+        runnableStates = 0;
+        int maxPriority = 6;
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if (p->state != RUNNABLE || p->queue!=PRIORITYQUEUE)
+            continue;
+          // cprintf("------------------------------------------------------------------3");
+
+          runnableStates = 1;
+
+          if (p->priority < maxPriority)
+          {
+            maxPriority = p->priority;
+          }
+        }
+        // Loop over process table looking for process to run.
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if (p->state != RUNNABLE  || p->queue!=PRIORITYQUEUE)
+            continue;
+
+          if (p->priority == maxPriority)
+          {
+            // Switch to chosen process.  It is the process's job
+            // to release ptable.lock and then reacquire it
+            // before jumping back to us.
+            c->proc = p;
+            switchuvm(p);
+            p->state = RUNNING;
+
+            swtch(&(c->scheduler), p->context);
+            switchkvm();
+
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+            c->proc = 0;
+          }
+        }
+      }
+
+      runnableStates = 1;
+      currentQueue = XPRIORITYQUEUE;
+      while (runnableStates)
+      {
+        runnableStates = 0;
+        int maxPriority = 1;
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if (p->state != RUNNABLE  || p->queue!=XPRIORITYQUEUE)
+            continue;
+          // cprintf("------------------------------------------------------------------2");
+
+          runnableStates = 1;
+
+          if (p->priority > maxPriority)
+          {
+            maxPriority = p->priority;
+          }
+        }
+        // Loop over process table looking for process to run.
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if (p->state != RUNNABLE || p->queue!=XPRIORITYQUEUE)
+            continue;
+
+          if (p->priority == maxPriority)
+          {
+            // Switch to chosen process.  It is the process's job
+            // to release ptable.lock and then reacquire it
+            // before jumping back to us.
+            c->proc = p;
+            switchuvm(p);
+            p->state = RUNNING;
+
+            swtch(&(c->scheduler), p->context);
+            switchkvm();
+
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+            c->proc = 0;
+          }
+        }
+      }
+
+      runnableStates = 1;
+      currentQueue = ROUNDROBINQUEUE;
+      while (runnableStates > 0)
+      {
+        
+        runnableStates = 0;
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if (p->state != RUNNABLE || p->queue!=ROUNDROBINQUEUE)
+            continue;
+
+          // cprintf("------------------------------------------------------------------1");
+          runnableStates = 1;
+          // Switch to chosen process.  It is the process's job
+          // to release ptable.lock and then reacquire it
+          // before jumping back to us.
+          c->proc = p;
+          switchuvm(p);
+          p->state = RUNNING;
+
+          swtch(&(c->scheduler), p->context);
+          switchkvm();
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+      }
+
+      currentQueue = NOQUEUE;
+    }
   
     release(&ptable.lock);
   }
@@ -702,11 +882,11 @@ waitAndSetTimes(int* cpuBurstTime,int* turnAroundTime ,int* waitingTime)
         // Found one.
 
         p->terminationTime = ticks;
-        *turnAroundTime = p->terminationTime - p->creationTime;
+        *turnAroundTime = p->runningTime + p->readyTime + p->sleepingTime;
         *cpuBurstTime = p->runningTime;
         *waitingTime = p->readyTime;
-        cprintf("\nkernel : %d %d %d %d %d \n",p->creationTime,p->terminationTime,p->runningTime,p->readyTime,p->sleepingTime);
-
+        cprintf("\nkernel  %d : %d %d %d %d %d \n", p->pid, p->creationTime, p->terminationTime, p->runningTime, p->readyTime, p->sleepingTime);
+        
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -739,5 +919,42 @@ waitAndSetTimes(int* cpuBurstTime,int* turnAroundTime ,int* waitingTime)
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock); //DOC: wait-sleep
   }
+  return 0;
+}
+
+int pushToQueue(int queueNumber, int pid)
+{
+  acquire(&ptable.lock);
+  struct proc *p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->pid == pid)
+      p->queue = queueNumber;
+  release(&ptable.lock);
+
+  // if (queueNumber == NOQUEUE)
+  // {
+  //   noQueue.queue[noQueue.tail] = p;
+  //   noQueue.tail++;
+  // }
+  // if (queueNumber == DEFAULTQUEUE)
+  // {
+  //   defaultQueue.queue[defaultQueue.tail] = p;
+  //   defaultQueue.tail++;
+  // }
+  // if (queueNumber == PRIORITYQUEUE)
+  // {
+  //   priorityQueue.queue[priorityQueue.tail] = p;
+  //   priorityQueue.tail++;
+  // }
+  // if (queueNumber == XPRIORITYQUEUE)
+  // {
+  //   xPriorityQueue.queue[xPriorityQueue.tail] = p;
+  //   xPriorityQueue.tail++;
+  // }
+  // if (queueNumber == ROUNDROBINQUEUE)
+  // {
+  //   roundRobinQueue.queue[roundRobinQueue.tail] = p;
+  //   roundRobinQueue.tail++;
+  // }
   return 0;
 }

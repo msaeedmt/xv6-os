@@ -127,6 +127,7 @@ int             setPriority(int,int);
 int             changePolicy(int);
 int             waitAndSetTimes(int*, int* , int*);
 void            increamentTimes();
+int             pushToQueue(int, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
